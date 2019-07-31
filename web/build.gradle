@@ -68,6 +68,7 @@ kotlin {
                 implementation kotlin("stdlib-js")
 
                 implementation project(":asoft-ui")
+                implementation "com.github.andylamax.asoft-persist:asoft-persist-js:2.3.0"
                 implementation "org.jetbrains:kotlin-react:$kotlin_react_version"
                 implementation "org.jetbrains:kotlin-react-dom:$kotlin_react_dom_version"
                 implementation "org.jetbrains:kotlin-styled:$kotlin_styled_version"

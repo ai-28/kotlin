@@ -1,5 +1,6 @@
 package tz.co.asoft.kotlinhtml.staff
 
+import kotlinx.coroutines.launch
 import kotlinx.css.*
 import kotlinx.html.InputType
 import kotlinx.html.id
@@ -15,14 +16,25 @@ import react.RProps
 import react.RState
 import styled.*
 import tz.co.asoft.kotlinhtml.Staff
+import tz.co.asoft.kotlinhtml.injectio
+import tz.co.asoft.ui.module.ScopedRComponent
+import tz.co.asoft.ui.react.widget.button.primaryButton
+import tz.co.asoft.ui.react.widget.dateinput.dateInput
+import tz.co.asoft.ui.react.widget.dropdown.dropDown
+import tz.co.asoft.ui.react.widget.radio.radioButton
+import tz.co.asoft.ui.react.widget.text.textinput.textInput
+import tz.co.asoft.ui.theme.Theme
 import kotlin.browser.document
 import kotlin.js.Date
 import tz.co.asoft.kotlinhtml.staff.StaffForm.Props as Props
 
-class StaffForm : RComponent<Props, RState>() {
+class StaffForm : ScopedRComponent<Props, RState>() {
+
+    private val viewModel = injectio.viewModel.staffForm()
 
     object Props : RProps {
         var onStaffAdded = { _: Staff -> }
+        var theme = Theme()
     }
 
     private val FORM_ID = "add-staff"
@@ -41,12 +53,18 @@ class StaffForm : RComponent<Props, RState>() {
             region = (form["region"] as HTMLSelectElement).value
         }
         console.log(staff)
+        sendStaffToDb(staff)
+    }
+
+    private fun sendStaffToDb(staff: Staff) = launch {
+        viewModel.create(staff)
         props.onStaffAdded(staff)
     }
 
     private fun RBuilder.form() = styledForm {
         css {
             display = Display.grid
+            gap = Gap("1em")
             gridTemplateColumns = GridTemplateColumns("1fr 1fr")
             justifyContent = JustifyContent.center
             alignItems = Align.center
@@ -58,104 +76,73 @@ class StaffForm : RComponent<Props, RState>() {
             submit()
         }
 
-        styledInput(type = InputType.text) {
-            css {
-                +StaffFormStyles.inputs
-            }
+        textInput {
             attrs {
+                theme = props.theme
                 name = "name"
-                placeholder = "Name"
-                required = true
+                hint = "John Doe"
+                label = "Enter full Name"
             }
         }
 
-        styledSelect {
-            css {
-                +StaffFormStyles.inputs
-            }
+        dropDown {
             attrs {
+                theme = props.theme
                 name = "region"
-                required = true
             }
-            styledOption {
-                attrs { value = "" }
-                +"Select Region"
-            }
-            styledOption { +"Dar" }
-            styledOption { +"Arusha" }
-            styledOption { +"Mwanza" }
+            attrs.options = listOf(
+                    "Select a Region",
+                    "Dar",
+                    "Arusha",
+                    "Mwanza",
+                    "Kigoma"
+            )
         }
 
-        styledInput(type = InputType.date) {
-            css {
-                +StaffFormStyles.inputs
-            }
+        dateInput {
             attrs {
+                theme = props.theme
                 name = "dob"
-                placeholder = "Date of Birth"
-                required = true
+                label = "Date of Birth"
             }
         }
 
-        styledInput(type = InputType.text) {
-            css {
-                +StaffFormStyles.inputs
-            }
+        textInput {
             attrs {
+                theme = props.theme
                 name = "title"
-                placeholder = "title"
-                required = true
+                label = "title"
             }
         }
 
         styledDiv {
-            styledInput(type = InputType.radio) {
-                css {
-                    +StaffFormStyles.inputs
-                }
+            radioButton("Male") {
                 attrs {
+                    theme = props.theme
                     name = "gender"
                     value = "Male"
                 }
             }
-
-            styledLabel {
-                +"Male"
-            }
-
         }
 
 
         styledDiv {
-
-            styledInput(type = InputType.radio) {
-                css {
-                    color = Color.blue
-                }
+            radioButton("Female") {
                 attrs {
+                    theme = props.theme
                     name = "gender"
                     value = "Female"
                 }
             }
-
-            styledLabel {
-                +"Female"
-            }
         }
 
-
-        styledInput(type = InputType.submit) {
-            css {
+        primaryButton("Submit") {
+            attrs.css = {
                 gridColumn = GridColumn("2/3")
-                color = Color.white
-                backgroundColor = Color("#1581d6")
-                margin(2.em)
-                padding(all = 8.px)
-                border = "solid 1px black"
-                borderRadius = 5.px
             }
             attrs {
-                value = "Submit"
+                theme = props.theme
+                isSubmit = true
             }
         }
     }
