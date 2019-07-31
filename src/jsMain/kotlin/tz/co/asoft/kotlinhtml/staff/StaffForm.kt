@@ -1,7 +1,9 @@
 package tz.co.asoft.kotlinhtml.staff
 
+import kotlinx.css.*
 import kotlinx.html.InputType
 import kotlinx.html.id
+import kotlinx.html.label
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -10,7 +12,14 @@ import styled.*
 
 class StaffForm : RComponent<RProps, RState>() {
 
-    override fun RBuilder.render(): dynamic = styledForm {
+    private fun RBuilder.form() =styledForm {
+        css{
+            display = Display.grid
+            gridTemplateColumns = GridTemplateColumns("1fr 1fr")
+            justifyContent = JustifyContent.center
+            alignItems = Align.center
+
+        }
         attrs.id = "add-staff"
 
 
@@ -26,6 +35,9 @@ class StaffForm : RComponent<RProps, RState>() {
         }
 
         styledSelect {
+            css{
+                + StaffFormStyles.inputs
+            }
             attrs {
                 name = "region"
                 required = true
@@ -51,6 +63,9 @@ class StaffForm : RComponent<RProps, RState>() {
         }
 
         styledInput(type = InputType.text) {
+            css {
+                + StaffFormStyles.inputs
+            }
             attrs {
                 name = "title"
                 placeholder = "title"
@@ -58,10 +73,64 @@ class StaffForm : RComponent<RProps, RState>() {
             }
         }
 
+        styledDiv {
+            styledInput(type = InputType.radio) {
+                css {
+                    + StaffFormStyles.inputs
+                }
+                attrs {
+                    name = "gender"
+                    value = "Male"
+                }
+            }
+
+            styledLabel {
+                + "Male"
+            }
+
+        }
+
+
+        styledDiv {
+
+            styledInput (type = InputType.radio) {
+                css {
+                    color = Color.blue
+                }
+                attrs {
+                    name = "gender"
+                    value = "Female"
+                }
+            }
+
+            styledLabel {
+                + "Female"
+            }
+        }
+
+
         styledInput(type = InputType.submit) {
+            css {
+                gridColumn = GridColumn("2/3")
+                color = Color.white
+                backgroundColor = Color("#1581d6")
+                margin(2.em)
+                padding(all = 8.px)
+                border = "solid 1px black"
+                borderRadius = 5.px
+            }
             attrs {
                 value = "Submit"
             }
+        } }
+
+    override fun RBuilder.render(): dynamic = styledDiv {
+        + "Add Staff"
+        css{
+            margin(8.em)
+            height = 100.vh
+            textAlign = TextAlign.center
         }
+        form()
     }
 }
