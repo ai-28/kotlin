@@ -3,29 +3,64 @@ package tz.co.asoft.kotlinhtml.staff
 import kotlinx.css.*
 import kotlinx.html.InputType
 import kotlinx.html.id
+import kotlinx.html.js.onSubmitFunction
 import kotlinx.html.label
+import org.w3c.dom.HTMLFormElement
+import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.HTMLSelectElement
+import org.w3c.dom.get
 import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
 import styled.*
+import tz.co.asoft.kotlinhtml.Staff
+import kotlin.browser.document
+import kotlin.js.Date
+import tz.co.asoft.kotlinhtml.staff.StaffForm.Props as Props
 
-class StaffForm : RComponent<RProps, RState>() {
+class StaffForm : RComponent<Props, RState>() {
 
-    private fun RBuilder.form() =styledForm {
-        css{
+    object Props : RProps {
+        var onStaffAdded = { _: Staff -> }
+    }
+
+    private val FORM_ID = "add-staff"
+
+    private fun HTMLFormElement.getVal(id: String) = (get(id).unsafeCast<HTMLInputElement>()).value
+
+    private fun submit() {
+        val form = document.getElementById(FORM_ID) as HTMLFormElement
+        console.dir(form)
+
+        val staff = Staff().apply {
+            name = form.getVal("name")
+            date = Date(form.getVal("dob"))
+            gender = form.getVal("gender")
+            title = form.getVal("title")
+            region = (form["region"] as HTMLSelectElement).value
+        }
+        console.log(staff)
+        props.onStaffAdded(staff)
+    }
+
+    private fun RBuilder.form() = styledForm {
+        css {
             display = Display.grid
             gridTemplateColumns = GridTemplateColumns("1fr 1fr")
             justifyContent = JustifyContent.center
             alignItems = Align.center
 
         }
-        attrs.id = "add-staff"
-
+        attrs.id = FORM_ID
+        attrs.onSubmitFunction = {
+            it.preventDefault()
+            submit()
+        }
 
         styledInput(type = InputType.text) {
             css {
-                + StaffFormStyles.inputs
+                +StaffFormStyles.inputs
             }
             attrs {
                 name = "name"
@@ -35,8 +70,8 @@ class StaffForm : RComponent<RProps, RState>() {
         }
 
         styledSelect {
-            css{
-                + StaffFormStyles.inputs
+            css {
+                +StaffFormStyles.inputs
             }
             attrs {
                 name = "region"
@@ -53,7 +88,7 @@ class StaffForm : RComponent<RProps, RState>() {
 
         styledInput(type = InputType.date) {
             css {
-                + StaffFormStyles.inputs
+                +StaffFormStyles.inputs
             }
             attrs {
                 name = "dob"
@@ -64,7 +99,7 @@ class StaffForm : RComponent<RProps, RState>() {
 
         styledInput(type = InputType.text) {
             css {
-                + StaffFormStyles.inputs
+                +StaffFormStyles.inputs
             }
             attrs {
                 name = "title"
@@ -76,7 +111,7 @@ class StaffForm : RComponent<RProps, RState>() {
         styledDiv {
             styledInput(type = InputType.radio) {
                 css {
-                    + StaffFormStyles.inputs
+                    +StaffFormStyles.inputs
                 }
                 attrs {
                     name = "gender"
@@ -85,7 +120,7 @@ class StaffForm : RComponent<RProps, RState>() {
             }
 
             styledLabel {
-                + "Male"
+                +"Male"
             }
 
         }
@@ -93,7 +128,7 @@ class StaffForm : RComponent<RProps, RState>() {
 
         styledDiv {
 
-            styledInput (type = InputType.radio) {
+            styledInput(type = InputType.radio) {
                 css {
                     color = Color.blue
                 }
@@ -104,7 +139,7 @@ class StaffForm : RComponent<RProps, RState>() {
             }
 
             styledLabel {
-                + "Female"
+                +"Female"
             }
         }
 
@@ -122,11 +157,12 @@ class StaffForm : RComponent<RProps, RState>() {
             attrs {
                 value = "Submit"
             }
-        } }
+        }
+    }
 
     override fun RBuilder.render(): dynamic = styledDiv {
-        + "Add Staff"
-        css{
+        +"Add Staff"
+        css {
             margin(8.em)
             height = 100.vh
             textAlign = TextAlign.center

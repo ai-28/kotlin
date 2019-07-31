@@ -12,6 +12,8 @@ import tz.co.asoft.kotlinhtml.staff.StaffUI
 class App : RComponent<RProps, State>() {
     class State : RState {
         var showing = UI.Home
+        var staff = Staff()
+        var staffs = mutableListOf<Staff>()
     }
 
     init {
@@ -25,12 +27,16 @@ class App : RComponent<RProps, State>() {
     }
 
     private fun RBuilder.navigation() = child(Navigation::class.js, Navigation.Props) {
+        attrs.staffs = state.staffs
         attrs.onHomeClicked = {
             setState { showing = UI.Home }
         }
 
         attrs.onStaffClicked = {
-            setState { showing = UI.StaffUI }
+            setState {
+                staff = it
+                showing = UI.StaffUI
+            }
         }
 
         attrs.onAddStaff = {
@@ -39,8 +45,16 @@ class App : RComponent<RProps, State>() {
     }
 
     private fun RBuilder.showHome() = child(Home::class) {}
-    private fun RBuilder.showStaffUI() = child(StaffUI::class) {}
-    private fun RBuilder.showStaffForm() = child(StaffForm::class) {}
+    private fun RBuilder.showStaffUI() = child(StaffUI::class.js,StaffUI.Props) {
+        attrs {
+            staff = state.staff
+        }
+    }
+    private fun RBuilder.showStaffForm() = child(StaffForm::class.js, StaffForm.Props) {
+        attrs.onStaffAdded = { staff ->
+            setState { staffs.add(staff) }
+        }
+    }
 
     private fun RBuilder.body() = styledDiv {
         css {

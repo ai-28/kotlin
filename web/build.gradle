@@ -1,0 +1,130 @@
+buildscript {
+    ext {
+        kotlin_version = "1.3.31"
+        kotlin_react_version = "16.6.0-pre.78-kotlin-1.3.41"
+        kotlin_react_dom_version = kotlin_react_version
+        kotlin_react_router_dom_version = "4.3.1-pre.78-kotlin-1.3.41"
+        kotlin_styled_version = "1.0.0-pre.78-kotlin-1.3.41"
+    }
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.45"
+    }
+}
+
+plugins {
+    id('kotlin-multiplatform') version "1.3.31"
+}
+
+group 'tz.co.asoft'
+version '0.0.0'
+
+tasks.whenTaskAdded { task ->
+    if (task.name.contains("npm")) {
+        task.enabled = false
+    }
+}
+
+apply plugin: 'maven-publish'
+apply plugin: "kotlin-dce-js"
+apply plugin: "org.jetbrains.kotlin.frontend"
+
+repositories {
+    google()
+    jcenter()
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+    maven { url "https://kotlin.bintray.com/kotlinx" }
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-js-wrappers' }
+    maven { url 'https://dl.bintray.com/kotlinx/kotlinx' }
+    maven { url "https://kotlin.bintray.com/kotlinx" }
+    maven { url "https://jitpack.io" }
+    mavenCentral()
+}
+
+
+kotlin {
+    js() {
+        compilations.all {
+            tasks[compileKotlinTaskName].kotlinOptions {
+                kotlinOptions.metaInfo = true
+                kotlinOptions.sourceMap = true
+                kotlinOptions.moduleKind = 'commonjs'
+                kotlinOptions.main = "call"
+            }
+        }
+    }
+
+    sourceSets {
+        commonMain {
+
+        }
+
+        jsMain {
+            dependencies {
+                implementation kotlin("stdlib-js")
+
+                implementation project(":asoft-ui")
+                implementation "org.jetbrains:kotlin-react:$kotlin_react_version"
+                implementation "org.jetbrains:kotlin-react-dom:$kotlin_react_dom_version"
+                implementation "org.jetbrains:kotlin-styled:$kotlin_styled_version"
+                implementation "org.jetbrains:kotlin-react-router-dom:$kotlin_react_router_dom_version"
+            }
+        }
+    }
+}
+
+kotlinFrontend {
+    npm {
+        dependency("react")
+        dependency("react-dom")
+        dependency("styled-components")
+        dependency("inline-style-prefixer")
+        dependency("react-router-dom")
+        dependency("text-encoding")
+        dependency("core-js", "^3.0.0")
+
+        dependency('react-responsive-carousel', '3.1.47')
+        dependency('react-event-timeline', '1.5.4')
+
+        dependency("echarts", "4.2.1")
+        dependency("echarts-for-react", "2.0.14")
+
+        dependency("firebase", "5.11.1")
+
+        dependency("react-tabs", "3.0.0")
+        dependency("react-table", "6.9.2")
+        dependency("react-draft-wysiwyg", "1.13.2")
+
+        dependency("@react-google-maps/api","1.3.0")
+
+        dependency("draft-js", "0.10.5")
+        dependency("react-icons", "3.5.0")
+
+        devDependency("file-loader")
+        devDependency("style-loader")
+        devDependency("css-loader")
+        devDependency("less")
+        devDependency("less-loader")
+        devDependency("babel-loader", "8")
+
+        //
+        devDependency("@babel/core")
+        devDependency("@babel/preset-env")
+        devDependency("@babel/preset-react")
+
+        //
+        devDependency("webpack")
+        devDependency("webpack-cli")
+        devDependency("webpack-common-shake")
+    }
+
+    webpackBundle {
+        bundleName = "main"
+        host = "0.0.0.0"
+        contentPath = file("$projectDir/src/jsMain/resources")
+    }
+}

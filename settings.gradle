@@ -23,3 +23,5 @@ pluginManagement {
 }
 
 rootProject.name = 'kotlinHtml'
+include(":asoft-ui")
+include(":web")

@@ -1,32 +1,34 @@
 package tz.co.asoft.kotlinhtml.staff
 
 import kotlinx.css.*
-import react.RBuilder
-import react.RComponent
-import react.RProps
-import react.RState
+import kotlinx.html.js.onClickFunction
+import react.*
 import react.dom.*
 import styled.*
+import tz.co.asoft.kotlinhtml.Staff
+import tz.co.asoft.kotlinhtml.staff.StaffUI.Props as Props
+import tz.co.asoft.kotlinhtml.staff.StaffUI.State as State
 
-class StaffUI : RComponent<RProps, RState>() {
+class StaffUI : RComponent<Props, State>() {
 
-//    private fun RBuilder.staffDetails() = styledDiv {
-//
-//    }
-    override fun RBuilder.render(): dynamic = styledDiv {
+    object Props : RProps {
+        var staff = Staff()
+    }
 
-        css {
-            border = "solid 1px blue"
-            width = 60.pct
-            height = 60.vh
-            padding(all= 85.px)
-            margin(4.em)
-            backgroundColor = Color("#1581d6")
+    class State : RState {
+        var currentUI = UI.Few
+    }
 
-        }
+    init {
+        state = State()
+    }
 
-    styledDiv {
+    enum class UI {
+        Few,
+        More
+    }
 
+    private fun RBuilder.few() = styledDiv {
         css {
             textAlign = TextAlign.center
             padding(10.px)
@@ -34,18 +36,18 @@ class StaffUI : RComponent<RProps, RState>() {
 
         styledLabel {
 
-            css{
+            css {
                 textAlign = TextAlign.center
                 color = Color.white
             }
 
-            + "Name"
-            br {  }
-            + "Title"
+            +props.staff.name
+            br { }
+            +props.staff.title
         }
     }
 
-    styledTable {
+    private fun RBuilder.more() = styledTable {
 
         css {
             width = 100.pct
@@ -63,12 +65,13 @@ class StaffUI : RComponent<RProps, RState>() {
                 css {
                     border = "1px solid white"
                 }
-                + "Gender"
+                +"Gender"
             }
             styledTd {
                 css {
                     border = "1px solid white"
                 }
+                +props.staff.gender
             }
         }
         styledTr {
@@ -80,12 +83,13 @@ class StaffUI : RComponent<RProps, RState>() {
                 css {
                     border = "1px solid white"
                 }
-                + "D.O.B"
+                +"D.O.B"
             }
             styledTd {
                 css {
                     border = "1px solid white"
                 }
+                +props.staff.date.toDateString()
             }
         }
         styledTr {
@@ -100,18 +104,53 @@ class StaffUI : RComponent<RProps, RState>() {
                 css {
                     border = "1px solid white"
                 }
+                +props.staff.region
             }
         }
     }
+
+    private fun handleShowMore() = setState {
+        currentUI = if (state.currentUI == UI.More) {
+            UI.Few
+        } else {
+            UI.More
+        }
+    }
+
+    override fun RBuilder.render(): dynamic = styledDiv {
+
+        css {
+            border = "solid 1px blue"
+            width = 60.pct
+            height = 60.vh
+            padding(all = 85.px)
+            margin(4.em)
+            backgroundColor = Color("#1581d6")
+
+        }
+
+        few()
+
+        if (state.currentUI == UI.More) {
+            more()
+        }
+
         styledDiv {
             css {
                 textAlign = TextAlign.center
             }
             styledButton {
                 css {
-                    + StaffFormStyles.button
+                    +StaffFormStyles.button
                 }
-                + "Show More"
+
+                attrs.onClickFunction = { handleShowMore() }
+
+                if (state.currentUI == UI.Few) {
+                    +"Show More"
+                } else {
+                    +"Show Less"
+                }
             }
         }
     }

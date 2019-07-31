@@ -10,9 +10,10 @@ import tz.co.asoft.kotlinhtml.Navigation.Props
 
 class Navigation : RComponent<Props, RState>() {
     object Props : RProps {
+        var staffs = mutableListOf<Staff>()
         var onHomeClicked = {}
         var onAddStaff = {}
-        var onStaffClicked = {}
+        var onStaffClicked = {_:Staff->}
     }
 
     private fun RBuilder.addStaff() = styledDiv {
@@ -29,14 +30,14 @@ class Navigation : RComponent<Props, RState>() {
         +"Add Staff"
     }
 
-    private fun RBuilder.menuItem(title: String) = styledDiv {
+    private fun RBuilder.menuItem(staff: Staff) = styledDiv {
         css {
             +AppStyles.menuItems
         }
         attrs.onClickFunction = {
-            props.onStaffClicked()
+            props.onStaffClicked(staff)
         }
-        +title
+        +staff.name
     }
 
     override fun RBuilder.render(): dynamic = styledDiv {
@@ -60,9 +61,9 @@ class Navigation : RComponent<Props, RState>() {
             +"aSoft Staff"
         }
 
-        menuItem("Andy")
-        menuItem("Luge")
-        menuItem("Justine")
+        props.staffs.forEach { staff ->
+            menuItem(staff)
+        }
         addStaff()
     }
 }

@@ -1,0 +1,3 @@
+[submodule "asoft-ui"]
+	path = asoft-ui
+	url = https://github.com/andylamax/asoft-ui.git
